@@ -1,0 +1,60 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "move_to_archive",
+      "description": "Move an inactive folder to the PARA archive after explicit user approval.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "folder_path": {
+            "type": "string",
+            "description": "Folder to archive, relative to the vault root."
+          },
+          "archive_root": {
+            "type": "string",
+            "description": "Archive root folder relative to the vault root.",
+            "default": "4-Archives"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why the folder is considered inactive."
+          }
+        },
+        "required": ["folder_path", "reason"],
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "spin_up_project",
+      "description": "Create a PARA project note/folder for an active outcome.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "project_name": {
+            "type": "string",
+            "description": "Name of the project."
+          },
+          "desired_outcome": {
+            "type": "string",
+            "description": "Concrete outcome or finish line."
+          },
+          "next_action": {
+            "type": "string",
+            "description": "Immediate next action."
+          },
+          "projects_root": {
+            "type": "string",
+            "description": "Projects root folder relative to the vault root.",
+            "default": "1-Projects"
+          }
+        },
+        "required": ["project_name", "desired_outcome", "next_action"],
+        "additionalProperties": false
+      }
+    }
+  }
+]
