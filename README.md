@@ -1,122 +1,108 @@
-# test-repo-hermes
+# Hermes-PKM-Toolkit
 
-Starter primitives for running Hermes agents against a simple local Git workspace.
+Modular cognitive protocols for local-first AI agents working on plain-text PKM vaults.
 
-`test-repo-hermes` is not trying to replace Hermes. Hermes is the local agent/runtime layer. This repo provides the small, boring, useful structure that a non-programmer can give Hermes on day one: folders, labels, prompt hints, and references based on Johnny.Decimal, PARA, and GTD.
+Hermes-PKM-Toolkit is a small library of system prompts, file-operation tools, and framework-specific directives for agents such as Hermes or Moltbot. It helps an agent work inside Markdown/Obsidian-style folders without introducing a database, backend service, or hidden state.
 
-## What this project does
+The local filesystem is the database. Git is the audit log. Markdown is the interface.
 
-The project turns well-known personal organization systems into code primitives that can be scaffolded into a local folder and committed to Git:
+## Philosophy
 
-- **Johnny.Decimal primitives** for stable numbered places where files and notes can live.
-- **PARA primitives** for projects, areas, resources, and archives.
-- **GTD primitives** for capture, clarify, organize, reflect, and engage workflows.
-- **Hermes prompt hints** so a local agent knows how to use the workspace without needing the user to be a programmer.
+- **A la carte modules:** load only GTD, only Johnny.Decimal, only PARA, or any combination.
+- **Plain text first:** everything important is visible as `.md`, `.json`, or Python source.
+- **Agent-readable and human-readable:** every module contains human guidance and agent instructions.
+- **No heavy infrastructure:** no SQL, no vector database, no server requirement.
+- **Review before mutation:** agents should propose moves, writes, and archive operations before applying them.
 
-The current CLI generates a safe starter workspace. It does not call an LLM and it does not overwrite existing files unless a future command explicitly supports that.
+## Repository layout
 
-## What this adds to Hermes
+```text
+Hermes-PKM-Toolkit/
+  00_CORE/
+    hermes_base_system_prompt.md
+    file_ops.py
+    generic_file_ops_tools.json
+  01_JOHNNY_DECIMAL/
+    HUMANS_jd_guide.md
+    AGENT_jd_instructions.md
+    jd_routing_tools.json
+  02_GTD/
+    HUMANS_gtd_guide.md
+    AGENT_gtd_instructions.md
+    gtd_triage_tools.json
+  03_PARA/
+    HUMANS_para_guide.md
+    AGENT_para_instructions.md
+    para_archiving_tools.json
+```
 
-Hermes can run local agents, but a new user still needs a usable local operating system: where to put inputs, how to name work, what an agent should read first, and how to keep actions reviewable in Git.
+## How to integrate with a local agent
 
-This repository adds that missing starter layer:
+1. Load `00_CORE/hermes_base_system_prompt.md` as the base system prompt.
+2. Expose `00_CORE/file_ops.py` through the JSON schemas in `00_CORE/generic_file_ops_tools.json`.
+3. Add one or more module overrides:
+   - `01_JOHNNY_DECIMAL/AGENT_jd_instructions.md`
+   - `02_GTD/AGENT_gtd_instructions.md`
+   - `03_PARA/AGENT_para_instructions.md`
+4. Register the module-specific tool schemas if your agent runtime supports function calling.
+5. Point the agent at a local Markdown vault, ideally under Git.
 
-1. A tiny Python implementation of organization primitives.
-2. A scaffold command that creates a ready-to-commit workspace.
-3. A `HERMES.md` instruction file that tells the agent how to work safely.
-4. Tests that keep the structure deterministic as the project grows.
+Example stack:
 
-The intended user is someone who wants local AI automation but does not want to design an information architecture from scratch.
+```text
+Hermes agent
+  + base system prompt
+  + GTD instructions
+  + Johnny.Decimal instructions
+  + generic file tools
+  + GTD/JD tool schemas
+  -> local Obsidian vault in iCloud/Dropbox/local disk
+  -> Git commits for reviewable changes
+```
+
+## Tool schema format
+
+Tool definitions use an OpenAI-style function calling shape:
+
+```json
+{
+  "type": "function",
+  "function": {
+    "name": "read_md",
+    "description": "Read a Markdown file from the local vault.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  }
+}
+```
+
+The schemas are intentionally runtime-neutral. Hermes, Moltbot, or another local agent can map them to Python handlers, MCP tools, shell wrappers, or native function calls.
+
+## Module selection
+
+| Use case | Load modules |
+|---|---|
+| Quick capture and next actions | `00_CORE` + `02_GTD` |
+| Structured knowledge vault | `00_CORE` + `01_JOHNNY_DECIMAL` |
+| Project/resource management | `00_CORE` + `03_PARA` |
+| Full local PKM operating system | `00_CORE` + all modules |
+
+## Safety model
+
+- Treat every write, move, rename, and archive as a proposed diff.
+- Never invent top-level folder systems without user confirmation.
+- Never delete content through these primitives.
+- Prefer appending to inboxes and logs over destructive rewrites.
+- Keep secrets out of prompts, logs, and committed files.
+- Use Git commits as checkpoints when an agent changes the vault.
 
 ## Status
 
-Early-stage, under active development. The current code is intentionally small and dependency-free so it can be audited easily and used as a foundation for future Hermes/OpenClaw/Ollama workflows.
-
-## Getting started
-
-Requirements:
-
-- Python 3.10+
-- No third-party dependencies
-
-Clone and run the tests:
-
-```bash
-git clone https://github.com/ponzgpt/test-repo-hermes.git
-cd test-repo-hermes
-python3 -m unittest discover -s tests
-```
-
-Preview the starter primitives:
-
-```bash
-python3 -m hermes_workflow.cli primitives --preset starter
-```
-
-Create a local Hermes starter workspace:
-
-```bash
-python3 -m hermes_workflow.cli scaffold ./my-hermes-workspace --preset starter --write
-```
-
-The scaffold creates folders such as:
-
-```text
-my-hermes-workspace/
-  HERMES.md
-  00-inbox/
-  10-19-operations/
-  20-29-projects/
-  30-39-areas/
-  40-49-resources/
-  90-99-archive/
-  projects/
-  areas/
-  resources/
-  archives/
-  gtd/
-```
-
-## Example Hermes workflow
-
-After scaffolding, open the generated workspace in Git and ask Hermes to:
-
-```text
-Read HERMES.md, inspect 00-inbox, and propose a GTD next-action list.
-Do not move files yet. Produce a plan and Git diff first.
-```
-
-That gives the agent a small local map before it touches files. The user can review the plan, commit changes, or ask Hermes to refine the structure.
-
-## References and licensing notes
-
-This project implements lightweight interoperability primitives inspired by public descriptions of these systems. It does not copy proprietary templates, courses, diagrams, or paid materials.
-
-- Johnny.Decimal: https://johnnydecimal.com/
-- Johnny.Decimal introduction: https://johnnydecimal.com/documentation/introduction
-- PARA method: https://fortelabs.com/blog/para/
-- GTD overview: https://gettingthingsdone.com/what-is-gtd/
-
-## Roadmap / planned features
-
-- Add a richer Johnny.Decimal index generator for user-defined areas, categories, and IDs.
-- Add PARA import helpers that can classify existing folders into projects, areas, resources, and archives.
-- Add GTD inbox processing primitives for next actions, waiting-for, someday/maybe, and reference material.
-- Add a Hermes runbook format for repeatable local agent sessions.
-- Add examples for Ollama/OpenAI-compatible local endpoints once the workspace primitives are stable.
-
-## How Codex will be used
-
-Codex is useful here because this project is small, testable, and maintenance-heavy:
-
-- refine primitives without breaking scaffold output;
-- review pull requests for filesystem-safety regressions;
-- generate tests for edge cases in folder names and user-provided labels;
-- keep README examples and release notes accurate;
-- run security sweeps before adding commands that write, move, or classify user files.
-
-The intended workflow is issue-driven development, reviewed pull requests, and tests for each new primitive.
+Early-stage toolkit for local agent workflows in the Machines Do It Better ecosystem. The current scope is deliberately small: prompts, JSON tool schemas, and safe Python file primitives.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See `LICENSE`.
