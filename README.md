@@ -1,41 +1,43 @@
 # test-repo-hermes
 
-Local-first agent workflow scaffolding for reproducible LLM automation experiments.
+Starter primitives for running Hermes agents against a simple local Git workspace.
 
-> Working title: this repository began as a Hermes/GitHub workflow validation repo. It is now being shaped into a small open-source sandbox for local LLM agent orchestration and maintainer automation.
+`test-repo-hermes` is not trying to replace Hermes. Hermes is the local agent/runtime layer. This repo provides the small, boring, useful structure that a non-programmer can give Hermes on day one: folders, labels, prompt hints, and references based on Johnny.Decimal, PARA, and GTD.
 
 ## What this project does
 
-`test-repo-hermes` provides a minimal Python CLI and library for turning a plain-language automation goal into a structured local-agent plan:
+The project turns well-known personal organization systems into code primitives that can be scaffolded into a local folder and committed to Git:
 
-- break a task into repeatable planning, execution, validation, and review phases;
-- generate provider-neutral prompt packets that can be sent to Ollama, OpenAI-compatible local endpoints, or other local LLM runners;
-- keep the workflow deterministic enough to test before wiring it to real model calls;
-- document the maintenance path for future Hermes/OpenClaw-style local agent tooling.
+- **Johnny.Decimal primitives** for stable numbered places where files and notes can live.
+- **PARA primitives** for projects, areas, resources, and archives.
+- **GTD primitives** for capture, clarify, organize, reflect, and engage workflows.
+- **Hermes prompt hints** so a local agent knows how to use the workspace without needing the user to be a programmer.
 
-The current implementation is intentionally small and dependency-free. It is useful as a safe staging ground before adding model adapters, filesystem tools, or GitHub automation.
+The current CLI generates a safe starter workspace. It does not call an LLM and it does not overwrite existing files unless a future command explicitly supports that.
 
-## Why this matters
+## What this adds to Hermes
 
-Local LLM users often have the model runtime, scripts, and personal automation habits, but lack a simple reproducible workflow layer. This project focuses on the ecosystem gap between "I can call a local model" and "I can safely run repeatable agent workflows that are reviewable, testable, and maintainable."
+Hermes can run local agents, but a new user still needs a usable local operating system: where to put inputs, how to name work, what an agent should read first, and how to keep actions reviewable in Git.
 
-The long-term direction is self-hosted AI automation that is:
+This repository adds that missing starter layer:
 
-- reproducible across Ollama/OpenAI-compatible local endpoints;
-- inspectable before execution;
-- friendly to small maintainers and personal infrastructure;
-- safe to evolve through issues, tests, pull requests, and release notes.
+1. A tiny Python implementation of organization primitives.
+2. A scaffold command that creates a ready-to-commit workspace.
+3. A `HERMES.md` instruction file that tells the agent how to work safely.
+4. Tests that keep the structure deterministic as the project grows.
+
+The intended user is someone who wants local AI automation but does not want to design an information architecture from scratch.
 
 ## Status
 
-Early-stage, under active development. The repository is intentionally small while the project defines its public API, roadmap, and maintenance workflow.
+Early-stage, under active development. The current code is intentionally small and dependency-free so it can be audited easily and used as a foundation for future Hermes/OpenClaw/Ollama workflows.
 
 ## Getting started
 
 Requirements:
 
 - Python 3.10+
-- No third-party dependencies for the current CLI/tests
+- No third-party dependencies
 
 Clone and run the tests:
 
@@ -45,48 +47,75 @@ cd test-repo-hermes
 python3 -m unittest discover -s tests
 ```
 
-Generate a local-agent plan:
+Preview the starter primitives:
 
 ```bash
-python3 -m hermes_workflow.cli "Summarize new GitHub issues and propose labels"
+python3 -m hermes_workflow.cli primitives --preset starter
 ```
 
-Example output:
+Create a local Hermes starter workspace:
 
-```json
-{
-  "objective": "Summarize new GitHub issues and propose labels",
-  "backend": "openai-compatible",
-  "steps": [
-    "Clarify the objective and safety constraints",
-    "Collect local context and repository metadata",
-    "Draft an execution plan before making changes",
-    "Run the smallest useful automation step",
-    "Validate output and summarize follow-up work"
-  ]
-}
+```bash
+python3 -m hermes_workflow.cli scaffold ./my-hermes-workspace --preset starter --write
 ```
+
+The scaffold creates folders such as:
+
+```text
+my-hermes-workspace/
+  HERMES.md
+  00-inbox/
+  10-19-operations/
+  20-29-projects/
+  30-39-areas/
+  40-49-resources/
+  90-99-archive/
+  projects/
+  areas/
+  resources/
+  archives/
+  gtd/
+```
+
+## Example Hermes workflow
+
+After scaffolding, open the generated workspace in Git and ask Hermes to:
+
+```text
+Read HERMES.md, inspect 00-inbox, and propose a GTD next-action list.
+Do not move files yet. Produce a plan and Git diff first.
+```
+
+That gives the agent a small local map before it touches files. The user can review the plan, commit changes, or ask Hermes to refine the structure.
+
+## References and licensing notes
+
+This project implements lightweight interoperability primitives inspired by public descriptions of these systems. It does not copy proprietary templates, courses, diagrams, or paid materials.
+
+- Johnny.Decimal: https://johnnydecimal.com/
+- Johnny.Decimal introduction: https://johnnydecimal.com/documentation/introduction
+- PARA method: https://fortelabs.com/blog/para/
+- GTD overview: https://gettingthingsdone.com/what-is-gtd/
 
 ## Roadmap / planned features
 
-- Add an Ollama adapter that can execute a generated prompt packet against a local model.
-- Add an OpenAI-compatible local endpoint adapter for tools such as LM Studio, vLLM, Groq-compatible gateways, and OpenRouter-compatible proxies.
-- Add workflow templates for GitHub issue triage, README maintenance, release notes, and security review checklists.
-- Add structured run logs so agent decisions can be reviewed after execution.
-- Add CI checks and packaging metadata once the public API stabilizes.
+- Add a richer Johnny.Decimal index generator for user-defined areas, categories, and IDs.
+- Add PARA import helpers that can classify existing folders into projects, areas, resources, and archives.
+- Add GTD inbox processing primitives for next actions, waiting-for, someday/maybe, and reference material.
+- Add a Hermes runbook format for repeatable local agent sessions.
+- Add examples for Ollama/OpenAI-compatible local endpoints once the workspace primitives are stable.
 
 ## How Codex will be used
 
-Codex is a good fit for this repository because the maintainer work is exactly the kind of repetitive, review-heavy OSS work that benefits from a coding agent:
+Codex is useful here because this project is small, testable, and maintenance-heavy:
 
-- issue triage and roadmap grooming;
-- pull request review and test suggestions;
-- unit test generation for workflow edge cases;
-- refactors as the adapter API evolves;
-- release notes and changelog drafting;
-- lightweight security sweeps before adding filesystem or GitHub automation tools.
+- refine primitives without breaking scaffold output;
+- review pull requests for filesystem-safety regressions;
+- generate tests for edge cases in folder names and user-provided labels;
+- keep README examples and release notes accurate;
+- run security sweeps before adding commands that write, move, or classify user files.
 
-Codex will not be used to submit unreviewed model-generated changes directly to `main`. The intended workflow is issue-driven development, reviewed pull requests, and tests for each new automation capability.
+The intended workflow is issue-driven development, reviewed pull requests, and tests for each new primitive.
 
 ## License
 
