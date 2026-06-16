@@ -1,0 +1,30 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "create_jd_folder",
+      "description": "Create a Johnny.Decimal folder after the user approves the numeric category and name.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "category_id": {
+            "type": "string",
+            "description": "Approved numeric ID or range, for example 21 or 20-29.",
+            "pattern": "^[0-9]{2}(-[0-9]{2})?$"
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable folder name."
+          },
+          "parent_path": {
+            "type": "string",
+            "description": "Optional parent folder relative to the vault root.",
+            "default": ""
+          }
+        },
+        "required": ["category_id", "name"],
+        "additionalProperties": false
+      }
+    }
+  }
+]
