@@ -1,3 +1,14 @@
+> [!NOTE]
+> **Moved.** This is now `pkm-toolkit/` in **[ponzgpt/hermes-contributions](https://github.com/ponzgpt/hermes-contributions)**, together
+> with the three other things I built around Hermes Agent. Live at
+> **<https://hermes-contributions.technoir.cloud/pkm-toolkit/>**; `hermes-pkm-toolkit.technoir.cloud` now redirects there.
+>
+> This repository is archived and read-only. It is kept rather than deleted so that nothing
+> already linking here breaks.
+>
+> The skill install path changed: `hermes skills install
+> ponzgpt/hermes-contributions/pkm-toolkit/skills/hermes-pkm`.
+
 # hermes-pkm-toolkit
 
 Native skills and MCP primitives for agents that operate local Markdown/Obsidian PKM vaults.
